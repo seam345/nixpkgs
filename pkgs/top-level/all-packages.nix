@@ -8219,6 +8219,9 @@ with pkgs;
     inherit (darwin.apple_sdk.frameworks) Security;
   };
 
+
+  rustykey = callPackage ../tools/text/rustykey {  };
+
   robodoc = callPackage ../tools/text/robodoc { };
 
   ucg = callPackage ../tools/text/ucg { };

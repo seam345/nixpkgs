@@ -261,114 +261,19 @@ let
     }
 
     do_open_yubikey() {
-        # Make all of these local to this function
-        # to prevent their values being leaked
-        local salt
-        local iterations
-        local k_user
-        local challenge
-        local response
-        local k_luks
-        local opened
-        local new_salt
-        local new_iterations
-        local new_challenge
-        local new_response
-        local new_k_luks
+        rustykey open ${optionalString (!dev.yubikey.twoFactor) '' --1FA ''} ${optionalString (luks.reusePassphrases) '' --reuse-password ''} ${optionalString (dev.yubikey.debug) '' -vvv ''} \
+          --cryptsetup cryptsetup \
+          --device ${dev.device} \
+          --yubikey-slot ${toString dev.yubikey.slot} \
+          --salt-length ${toString dev.yubikey.saltLength} \
+          --key-length ${toString dev.yubikey.keyLength} \
+          --salt-iter-file /crypt-storage${dev.yubikey.storage.path} \
+          --name ${dev.name} \
+          --storage-device ${dev.yubikey.storage.device} \
+          --mount-fstype ${dev.yubikey.storage.fsType} \
+          --mount-point /crypt-storage \
+          -- ${optionalString dev.allowDiscards " --allow-discards " }${optionalString dev.bypassWorkqueues " --perf-no_read_workqueue --perf-no_write_workqueue" } ${optionalString (dev.header != null) " --header=${dev.header}"}
 
-        mount -t ${dev.yubikey.storage.fsType} ${dev.yubikey.storage.device} /crypt-storage || \
-          die "Failed to mount YubiKey salt storage device"
-
-        salt="$(cat /crypt-storage${dev.yubikey.storage.path} | sed -n 1p | tr -d '\n')"
-        iterations="$(cat /crypt-storage${dev.yubikey.storage.path} | sed -n 2p | tr -d '\n')"
-        challenge="$(echo -n $salt | openssl-wrap dgst -binary -sha512 | rbtohex)"
-        response="$(ykchalresp -${toString dev.yubikey.slot} -x $challenge 2>/dev/null)"
-
-        for try in $(seq 3); do
-            ${optionalString dev.yubikey.twoFactor ''
-            echo -n "Enter two-factor passphrase: "
-            k_user=
-            while true; do
-                if [ -e /crypt-ramfs/passphrase ]; then
-                    echo "reused"
-                    k_user=$(cat /crypt-ramfs/passphrase)
-                    break
-                else
-                    # Try reading it from /dev/console with a timeout
-                    IFS= read -t 1 -r k_user
-                    if [ -n "$k_user" ]; then
-                       ${if luks.reusePassphrases then ''
-                         # Remember it for the next device
-                         echo -n "$k_user" > /crypt-ramfs/passphrase
-                       '' else ''
-                         # Don't save it to ramfs. We are very paranoid
-                       ''}
-                       echo
-                       break
-                    fi
-                fi
-            done
-            ''}
-
-            if [ ! -z "$k_user" ]; then
-                k_luks="$(echo -n $k_user | pbkdf2-sha512 ${toString dev.yubikey.keyLength} $iterations $response | rbtohex)"
-            else
-                k_luks="$(echo | pbkdf2-sha512 ${toString dev.yubikey.keyLength} $iterations $response | rbtohex)"
-            fi
-
-            echo -n "$k_luks" | hextorb | ${csopen} --key-file=-
-
-            if [ $? == 0 ]; then
-                opened=true
-                ${if luks.reusePassphrases then ''
-                  # We don't rm here because we might reuse it for the next device
-                '' else ''
-                  rm -f /crypt-ramfs/passphrase
-                ''}
-                break
-            else
-                opened=false
-                echo "Authentication failed!"
-            fi
-        done
-
-        [ "$opened" == false ] && die "Maximum authentication errors reached"
-
-        echo -n "Gathering entropy for new salt (please enter random keys to generate entropy if this blocks for long)..."
-        for i in $(seq ${toString dev.yubikey.saltLength}); do
-            byte="$(dd if=/dev/random bs=1 count=1 2>/dev/null | rbtohex)";
-            new_salt="$new_salt$byte";
-            echo -n .
-        done;
-        echo "ok"
-
-        new_iterations="$iterations"
-        ${optionalString (dev.yubikey.iterationStep > 0) ''
-        new_iterations="$(($new_iterations + ${toString dev.yubikey.iterationStep}))"
-        ''}
-
-        new_challenge="$(echo -n $new_salt | openssl-wrap dgst -binary -sha512 | rbtohex)"
-
-        new_response="$(ykchalresp -${toString dev.yubikey.slot} -x $new_challenge 2>/dev/null)"
-
-        if [ ! -z "$k_user" ]; then
-            new_k_luks="$(echo -n $k_user | pbkdf2-sha512 ${toString dev.yubikey.keyLength} $new_iterations $new_response | rbtohex)"
-        else
-            new_k_luks="$(echo | pbkdf2-sha512 ${toString dev.yubikey.keyLength} $new_iterations $new_response | rbtohex)"
-        fi
-
-        echo -n "$new_k_luks" | hextorb > /crypt-ramfs/new_key
-        echo -n "$k_luks" | hextorb | ${cschange} --key-file=- /crypt-ramfs/new_key
-
-        if [ $? == 0 ]; then
-            echo -ne "$new_salt\n$new_iterations" > /crypt-storage${dev.yubikey.storage.path}
-            sync /crypt-storage${dev.yubikey.storage.path}
-        else
-            echo "Warning: Could not update LUKS key, current challenge persists!"
-        fi
-
-        rm -f /crypt-ramfs/new_key
-        umount /crypt-storage
     }
 
     open_with_hardware() {
@@ -789,6 +694,12 @@ in
                   description = lib.mdDoc "Whether to use a passphrase and a YubiKey (true), or only a YubiKey (false).";
                 };
 
+                debug = mkOption {
+                  default = false;
+                  type = types.bool;
+                  description = lib.mdDoc "Increase the log level of the unlock tool, mainly used for VM tests";
+                };
+
                 slot = mkOption {
                   default = 2;
                   type = types.int;
@@ -999,6 +910,7 @@ in
         copy_bin_and_libs ${pkgs.yubikey-personalization}/bin/ykchalresp
         copy_bin_and_libs ${pkgs.yubikey-personalization}/bin/ykinfo
         copy_bin_and_libs ${pkgs.openssl.bin}/bin/openssl
+        copy_bin_and_libs ${pkgs.rustykey}/bin/rustykey
 
         copy_bin_and_libs ${pbkdf2-sha512}/bin/pbkdf2-sha512
 
