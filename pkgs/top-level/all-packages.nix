@@ -8185,6 +8185,8 @@ with pkgs;
     inherit (darwin.apple_sdk.frameworks) Security;
   };
 
+  rustykey = callPackage ../tools/text/rustykey {  };
+
   grive2 = callPackage ../tools/filesystems/grive2 { };
 
   groff = callPackage ../tools/text/groff { };
