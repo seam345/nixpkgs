@@ -5,6 +5,7 @@
 
 , cmake
 , qttools
+, wrapGAppsHook
 , wrapQtAppsHook
 
 , curl
