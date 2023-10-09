@@ -37,6 +37,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     cmake
     qttools
+    wrapGAppsHook
     wrapQtAppsHook
   ];
 
@@ -66,6 +67,13 @@ stdenv.mkDerivation rec {
   qtWrapperArgs = [
     "--prefix LD_LIBRARY_PATH : ${libmediainfo}/lib"
   ];
+
+  # to prevent double wrapping of Qtwrap and Gwrap
+  dontWrapGApps = true;
+
+  preFixup = ''
+    qtWrapperArgs+=("''${gappsWrapperArgs[@]}")
+  '';
 
   meta = with lib; {
     homepage = "https://mediaelch.de/mediaelch/";
