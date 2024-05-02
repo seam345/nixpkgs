@@ -698,7 +698,7 @@ in
                 debug = mkOption {
                   default = false;
                   type = types.bool;
-                  description = lib.mdDoc "Increase the log level of the unlock tool, mainly used for VM tests";
+                  description = "Increase the log level of the unlock tool, mainly used for VM tests";
                 };
 
                 slot = mkOption {
