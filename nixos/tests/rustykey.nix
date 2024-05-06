@@ -33,6 +33,8 @@ in {
       useBootLoader = true;
       useEFIBoot = true;
       qemu.options = ["-device usb-host,vendorid=0x1050,productid=0x0407"];
+      # To boot off the encrypted disk, we need to have a init script which comes from the Nix store
+      mountHostNixStore = true;
     };
     boot.loader.systemd-boot.enable = true;
 
