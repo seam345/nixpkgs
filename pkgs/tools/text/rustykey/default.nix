@@ -23,13 +23,23 @@ rustPlatform.buildRustPackage rec {
 #  src = /home/sean/GitDirs/Gitlab/Seam345/rustykey;
   src = fetchFromGitLab {
     domain = "gitlab.com";
-    owner = "seam345";
+    owner = "roryjson";
     repo = pname;
-    rev = "2266b8e";
-    sha256 = "sha256-chQOOSa8L8/AnVTOn/a/lk86nTVrzGfuVbS5R8hfvDg=";
+    rev = "issue39-touch-timeout";
+    sha256 = "sha256-PUUMZ2u+nEYkUfp7MzXYBzmF6+Cf4MNKPN3kK58Lj2U=";
   };
 
-  cargoSha256 = "sha256-zz7WZmrnkHctl6x/+UMSz90SlkqErH+XFTQV12ie7Tk=";
+  cargoLock = {
+    lockFile = ./Cargo.lock;
+    outputHashes = {
+      "yubico_manager-0.9.0" = "sha256-3wp6sdtJ5GWitG/wFv+X36fqNW9jXNaNpEPGsuuN1rU=";
+    };
+  };
+
+
+#  cargoHash = "";
+#  cargoSha256 = "sha256-zz7WZmrnkHctl6x/+UMSz90SlkqErH+XFTQV12ie7Tk=";
+#  cargoHash = "sha256-l6E+6CUBwptqpaAFIqhivvlMWWBnFdSXuO8nJQofccc=";
 
 
 #  meta = with lib; {

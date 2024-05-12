@@ -14,16 +14,11 @@
 # devices to the guest (see
 # https://discourse.nixos.org/t/hardware-dependent-nixos-tests/18564
 # for discussion of other alternatives).
+#
+# todo  should setup cryptsetup as mentioned in https://nixos.wiki/wiki/Yubikey_based_Full_Disk_Encryption_(FDE)_on_NixOS and then unlock with rustykey to show replacement is possible
 
-import ./make-test-python.nix ({ lib, pkgs, ... }: let
+import ../../../../../nixos/tests/make-test-python.nix ({ lib, pkgs, ... }: {
 
-  keyfile = pkgs.writeText "luks-keyfile" ''
-    MIGHAoGBAJ4rGTSo/ldyjQypd0kuS7k2OSsmQYzMH6TNj3nQ/vIUjDn7fqa3slt2
-    gV6EK3TmTbGc4tzC1v4SWx2m+2Bjdtn4Fs4wiBwn1lbRdC6i5ZYCqasTWIntWn+6
-    FllUkMD5oqjOR/YcboxG8Z3B5sJuvTP9llsF+gnuveWih9dpbBr7AgEC
-  '';
-
-in {
   name = "systemd-initrd-luks-keyfile";
 
   nodes.machine = { pkgs, ... }: {
@@ -75,7 +70,7 @@ in {
       "mount /dev/vdc /crypt-storage",
     )
 
-    machine.succeed("echo -n supersecret |  rustykey format --cryptsetup cryptsetup --salt-iter-file /crypt-storage/default --yubikey-slot 1  --device /dev/vdb --password-file=- -- --iter-time=1")
+    # Here i should setup cryptsetup as mentioned in https://nixos.wiki/wiki/Yubikey_based_Full_Disk_Encryption_(FDE)_on_NixOS
     # Boot from the encrypted disk
     machine.succeed("bootctl set-default nixos-generation-1-specialisation-boot-luks.conf")
     machine.succeed("sync")
