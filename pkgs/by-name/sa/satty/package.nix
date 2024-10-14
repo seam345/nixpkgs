@@ -3,6 +3,7 @@
   rustPlatform,
   fetchFromGitHub,
   pkg-config,
+  wrapGAppsHook,
   wrapGAppsHook4,
   gdk-pixbuf,
   glib,
@@ -32,6 +33,7 @@ rustPlatform.buildRustPackage rec {
   nativeBuildInputs = [
     copyDesktopItems
     pkg-config
+    wrapGAppsHook
     wrapGAppsHook4
     installShellFiles
   ];
