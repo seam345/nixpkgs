@@ -6,6 +6,7 @@
 , SDL2
 , qttools
 , xorg
+, wrapGAppsHook
 , fetchFromGitHub
 , itstool
 }:
@@ -21,7 +22,7 @@ mkDerivation rec {
     sha256 = "sha256-HikaNbgPwsiIYNQgdEZiVdVYJtYgZRiXVqEce68tyxM=";
   };
 
-  nativeBuildInputs = [ cmake extra-cmake-modules pkg-config itstool ];
+  nativeBuildInputs = [ cmake extra-cmake-modules pkg-config itstool wrapGAppsHook];
   buildInputs = [
     SDL2
     qttools
