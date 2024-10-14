@@ -8,6 +8,7 @@
   qttools,
   xorg,
   fetchFromGitHub,
+  wrapGAppsHook,
   itstool,
 }:
 
@@ -27,6 +28,7 @@ mkDerivation rec {
     extra-cmake-modules
     pkg-config
     itstool
+    wrapGAppsHook
   ];
   buildInputs = [
     SDL2
