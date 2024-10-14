@@ -4,6 +4,8 @@
   cmake,
   kdePackages,
   pkg-config,
+  xorg,
+  wrapGAppsHook3,
   itstool,
   udevCheckHook,
   SDL2,
@@ -30,6 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
     itstool
     udevCheckHook
     libsForQt5.wrapQtAppsHook
+    wrapGAppsHook3
   ];
 
   buildInputs = [
