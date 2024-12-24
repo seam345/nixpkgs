@@ -35,7 +35,8 @@
   rttr,
   kpurpose,
   kdeclarative,
-  wrapGAppsHook3,
+  wrapGAppsHook,
+#  wrapGAppsHook3,
   glaxnimate,
 }:
 
@@ -49,6 +50,7 @@ mkDerivation {
   nativeBuildInputs = [
     extra-cmake-modules
     kdoctools
+    wrapGAppsHook
   ];
   buildInputs = [
     breeze-icons
@@ -82,7 +84,7 @@ mkDerivation {
     rttr
     kpurpose
     kdeclarative
-    wrapGAppsHook3
+#    wrapGAppsHook3
   ];
 
   # Both MLT and FFMpeg paths must be set or Kdenlive will complain that it

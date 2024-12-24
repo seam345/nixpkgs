@@ -14,6 +14,8 @@
   libv4l,
   open-timeline-io,
   frei0r,
+  glaxnimate,
+  wrapGAppsHook,
 }:
 mkKdeDerivation {
   pname = "kdenlive";
@@ -32,6 +34,7 @@ mkKdeDerivation {
   extraNativeBuildInputs = [
     pkg-config
     shared-mime-info
+    wrapGAppsHook
   ];
 
   extraBuildInputs = [
