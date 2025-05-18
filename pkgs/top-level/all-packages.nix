@@ -3211,6 +3211,8 @@ with pkgs;
     withXorg = false;
   };
 
+  rustykey = callPackage ../tools/text/rustykey {  };
+
   grub2 = callPackage ../tools/misc/grub/default.nix { };
 
   grub2_efi = grub2.override {
