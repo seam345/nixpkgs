@@ -24,7 +24,6 @@
   yarn,
   yarn-berry_4,
   runCommand,
-
   wrapGAppsHook3,
 
   swift,
@@ -177,6 +176,7 @@ python3Packages.buildPythonApplication (finalAttrs: {
     nodejs
     python3Packages.mypy-protobuf
     qt6.wrapQtAppsHook
+    wrapGAppsHook3
     rsync
     rustPlatform.cargoSetupHook
     writableTmpDirAsHomeHook
