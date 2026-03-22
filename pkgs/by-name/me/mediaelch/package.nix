@@ -14,6 +14,8 @@
   qt6Packages,
 
   qtVersion ? 6,
+
+  wrapGAppsHook3,
 }:
 
 let
@@ -44,6 +46,7 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
     qt'.qttools
     qt'.wrapQtAppsHook
+    wrapGAppsHook3
   ];
 
   buildInputs = [
