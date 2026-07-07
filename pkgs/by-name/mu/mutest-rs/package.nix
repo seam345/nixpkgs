@@ -34,8 +34,8 @@ let
   src = fetchFromGitHub {
     owner = "zalanlevai";
     repo = "mutest-rs";
-    rev = "28389268172721cf6e73ade4ea23e94663b35083";
-    hash = "sha256-5bYvgB5POswcL/dpPPAaTzNhq1QUI+emfQxvIbvXWTI=";
+    rev = "32950a2c6a86fe68a2e6b040b242c03490308074";
+    hash = "sha256-/iQc+RVOU0PF/UCVpLfu6/k9ruw3GO6M5LPRgFJ3xxU=";
   };
 in
 
@@ -58,7 +58,7 @@ rustPlatform.buildRustPackage {
     runHook preBuild
 
     # Build mutest-runtime, needed to be built first due to build steps in cargo-mutest build
-    # TODO I think cargo-mutest is just copying in the paths but we override it with MUTEST_SEARCH_PATH,
+    # TODO I think cargo-mutest is just copying in the paths but we override it with MUTEST_SEARCH_PATH in the postInstall.wrapProgram phase,
     # maybe we can add a flag to tell cargo-mutest to ignore not finding runtime...
     # if we can then we could build mutest-runtime in a separate file and skip this whole step only linking at postInstall
     cargo build --offline --release --target ${stdenv.targetPlatform.rust.rustcTargetSpec} --package mutest-runtime
